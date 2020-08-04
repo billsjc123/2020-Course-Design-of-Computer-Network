@@ -305,34 +305,6 @@ DNSPacket *unpackDNSPacket(char *);
 char *packDNSPacket(DNSPacket *, int&);
 ```
 
-## 测试用例及结果
-
-**启动DNS中继服务器**
-
-![image-20200803233640350](C:\Users\10343\AppData\Roaming\Typora\typora-user-images\image-20200803233640350.png)
-
-1. 基本功能测试
-
-- 不良网站拦截功能
-
-  ![image-20200803233802544](C:\Users\10343\AppData\Roaming\Typora\typora-user-images\image-20200803233802544.png)
-
-- 服务器功能
-
-  ![image-20200803233910828](C:\Users\10343\AppData\Roaming\Typora\typora-user-images\image-20200803233910828.png)
-
-- 中继功能
-
-  ![image-20200803233933767](C:\Users\10343\AppData\Roaming\Typora\typora-user-images\image-20200803233933767.png)
-
-- 此外，根据域名的特性（不区分大小写），针对含有大小写的域名统一进行转化为小写进行分析：
-
-  ![image-20200803234226012](C:\Users\10343\AppData\Roaming\Typora\typora-user-images\image-20200803234226012.png)
-
-- 服务器情况：
-
-  ![image-20200803234244539](C:\Users\10343\AppData\Roaming\Typora\typora-user-images\image-20200803234244539.png)
-
 ## 遇见的问题
 
 1. 程序在执行过程中经常莫名其妙出现数组越界等问题
