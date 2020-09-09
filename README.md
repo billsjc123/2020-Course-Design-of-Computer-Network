@@ -45,11 +45,11 @@
 
 **请求池模块流程图**
 
-![请求池流程图](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/请求池流程图.png)
+![请求池流程图](images\请求池流程图.png)
 
-**查询线程流程图**
+**查询线程流程图i**
 
-![查询线程流程图](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/查询线程流程图.png)
+![查询线程流程图](images\查询线程流程图.png)
 
 ## 运行逻辑
 
@@ -389,39 +389,39 @@ char *packDNSPacket(DNSPacket *, int&);
 
 **启动DNS中继服务器**
 
-![test1](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/test1.png)
+![test1](images\test1.png)
 
 1. 基本功能测试
 
 - 不良网站拦截功能
 
-  ![test2](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/test2.png)
+  ![test2](images\test2.png)
 
 - 服务器功能
 
-  ![test3](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/test3.png)
+  ![test3](images\test3.png)
 
 - 中继功能
 
-  ![test4](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/test4.png)
+  ![test4](images\test4.png)
 
 - 此外，根据域名的特性（不区分大小写），针对含有大小写的域名统一进行转化为小写进行分析：
 
-  ![test5](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/test5.png)
+  ![test5](images\test5.png)
 
 - 服务器情况：
 
-  ![test6](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/test6.png)
+  ![test6](images\test6.png)
 
 - 未命中缓存
 
-  ![test7](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/test7.png)
+  ![test7](images\test7.png)
 
   第一次查询alibaba.com，在host中无法找到对应域名，因此返回的域名类型`ADDRTYPE`是`ADDR_NOT_FOUND`（102）
 
 - 命中缓存
 
-  ![test8](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/test8.png)
+  ![test8](images\test8.png)
 
   可以看到出现了提示[CACHEHIT]表示命中缓存，并且返回的域名类型`ADDRTYPE`变成了`CACHED`(101)。
 
@@ -494,7 +494,7 @@ char *packDNSPacket(DNSPacket *, int&);
 
    在我们的测试过程中，我们发现假如连续两次输入一个相同的不存在的域名，会得到不一样的结果。
 
-   ![test9](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/test9.png)
+   ![test9](images\test9.png)
 
    起初我们以为是程序中的问题，并尝试寻找程序中的错误，但是一直没有找到。之后我们测试了老师给的样例程序，发现结果与我们的结果一致。通过对DNS服务器的原理的复习，我们发现，第一次请求一个陌生不存在的域名，因为查不到而超时；而第二次查询同一个域名时，因为第一次查询已经将该域名缓存到了本地DNS服务器的缓存中，因此直接会返回Non-existent domain。此外只要该缓存仍在生命周期之内，则会一直返回相同的结果。
 
@@ -502,7 +502,7 @@ char *packDNSPacket(DNSPacket *, int&);
 
    在测试的过程中，我们遇到了这样的问题，当第一次发送一个不存在的域名（不是屏蔽域名），客户端连续发送了四次查询报文给服务器，并由服务器转发。以下是抓包发现问题的截图：
 
-   ![test10](E:/BUPT/STUDY/计网课设/1804-史嘉程-1826-李浩天/images/test10.png)
+   ![test10](images/test10.png)
 
    由截图中可见，连续发送四次的查询报文的ID分别是0x2，0x3，0x4，0x5，而由服务器转发给上层DNS服务器的查询报文的ID分别是0x0，0x1，0x2，0x0。可见第一个报文和最后一个报文的ID发生了重复，而再发送最后一个报文之后，收到了原本0x0（0x2转化的）的应答报文，可是此时0x0对应的是原先的0x5报文，因此服务器将应答报文转发给了0x5，因此产生了BUG。
 
