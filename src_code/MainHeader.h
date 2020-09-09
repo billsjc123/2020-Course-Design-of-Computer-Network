@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
@@ -7,19 +7,19 @@
 #include <stdio.h>
 #include <thread>
 #include <mutex>
+#include <time.h>
 #pragma comment (lib, "Ws2_32.lib")
-
 
 #define DNS_PORT 53				//DNS serves on port 53
 #define DEFAULT_BUFLEN 1024
 #define DNS_HEADER_LEN 12
-#define MAX_HOST_ITEM 1010
+#define MAX_HOST_ITEM 1200
+#define MAX_CACHED_ITEM 200
 #define MAX_REQ 100
-#define UPPER_DNS "192.168.3.1"
+#define UPPER_DNS "10.3.9.5"
 #define HOST_FILE_LOC "dnsrelay.txt"
 #define MAX_THREAD 5
-
-
+#define MAX_REQ_TTL 10
 
 typedef unsigned short ushort;
 enum Query_QR { Q_QUERY = 0, Q_RESPONSE = 1 };
@@ -60,7 +60,7 @@ typedef struct DnsHeader
 
 /**
  * DNS报文询问部分
- * Name(unknown Bytes):		通常查询类型为 A 类型，表示由域名获取对应的 IP 地址
+ * Name(unknown Bytes):		
  * Type : 2 Bytes			通常查询类型为 A 类型，表示由域名获取对应的 IP 地址
  * Class : 2 Bytes          地址类型，通常为互联网地址，值为 1
  */
@@ -124,6 +124,7 @@ typedef struct RequestPOOL
 {
 	bool available;
 	DNSRequest *req;
+	time_t startTime;
 }ReqPool;
 
 
@@ -168,7 +169,7 @@ int initDNSServer(SOCKET *);
  *		线程从请求池中取出请求，根据域名种类进行不同情况的操作
  *		线程处理函数的参数不能有引用或者指针，指针只能指向常量，如const char*
  *		处理逻辑：若是BLOCKED或者CACHED则根据得到的ip构造新的应答报文发回给client
-		处理逻辑：若是NOT_FOUND则将报文发给DNS_SERVER（注意要更改id），再将得到的报文发回给client（由另一线程完成）
+ *		处理逻辑：若是NOT_FOUND则将报文发给DNS_SERVER（注意要更改id），再将得到的报文发回给client（由另一线程完成）
  */
 void CounsultThreadHandle(const char*, SOCKET, int);
 

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "MainHeader.h"
 
@@ -18,6 +18,21 @@ typedef struct host_item
 	char* webaddr;
 	ADDR_TYPE type;
 }host_item;
+
+/**
+ * cache表项
+ * ip_addr :				ip地址
+ * webaddr :				域名
+ * ttl :					该表项的生命周期
+ * occupied:				该表现是否被使用
+ */
+typedef struct cache_item
+{
+	UINT32 ip_addr;
+	char* webaddr;
+	int ttl;
+	int occupied;
+}cache_item;
 
 
 

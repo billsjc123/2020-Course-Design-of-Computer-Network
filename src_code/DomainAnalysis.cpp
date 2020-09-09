@@ -1,8 +1,9 @@
-﻿#include "DomainAnalysis.h"
+#include "DomainAnalysis.h"
 #include "MessageConversion.h"
 using namespace std;
 
 extern host_item *hosts_list[];
+extern cache_item *cached_list[];
 extern int host_counter;
 
 void loadHostsFromTxt()
@@ -21,8 +22,6 @@ void loadHostsFromTxt()
 	int cnt = 0;
 	while (!feof(fp))
 	{
-		if (cnt == 214)
-			cnt = cnt;
 		fgets(ipaddr, DEFAULT_BUFLEN, fp);
 		for (int i = 0; i < DEFAULT_BUFLEN; i++)
 		{
@@ -65,6 +64,7 @@ ADDR_TYPE getAddrType(char *addr, UINT32 *ip)
 	int i;
 	*ip = 0x0;
 	char *tmp_addr = (char*)malloc(DEFAULT_BUFLEN);
+	
 	strcpy(tmp_addr, addr);
 
 	// 将不可见的字符转化为.方便对比
@@ -78,7 +78,7 @@ ADDR_TYPE getAddrType(char *addr, UINT32 *ip)
 		}
 	}
 
-	printf("[Consulting Thread]:get domain from DNSPacket : %s\n", tmp_addr);
+	printf("[Consulting Thread ]:get domain from DNSPacket : %s\n", tmp_addr);
 
 	// 从host列表中找到ip
 	// 返回域名类型ADDR_TYPE
@@ -89,7 +89,7 @@ ADDR_TYPE getAddrType(char *addr, UINT32 *ip)
 	 *  - needle -- 在 haystack 字符串内要搜索的小字符串。
 	 *  - 该函数返回在 haystack 中第一次出现 needle 字符串的位置，如果未找到则返回 null。
 	 */
-	for(i = 0; i < host_counter; i++)
+	for(i = 0; i <= host_counter; i++)
 	{
 		if (strstr(tmp_addr, hosts_list[i]->webaddr))
 		{
@@ -100,6 +100,29 @@ ADDR_TYPE getAddrType(char *addr, UINT32 *ip)
 				return BLOCKED;
 		}
 	}
+
+	for (i = 0; i < MAX_CACHED_ITEM; i++)
+	{
+		if (!cached_list[i]->occupied) continue;
+		if (strstr(tmp_addr, cached_list[i]->webaddr))
+		{
+			printf("\n[CACHEHIT]: Cache ID: %d\n\n", i);
+			*ip = htonl(cached_list[i]->ip_addr);
+			cached_list[i]->ttl = 50;
+			if (*ip != 0)
+				return CACHED;
+			else
+				return BLOCKED;
+			
+		}
+		else
+		{
+			(cached_list[i]->ttl)--;
+			if (cached_list[i]->ttl == 0)
+				cached_list[i]->occupied = false;
+		}
+	}
+
 	return ADDR_NOT_FOUND;
 }
 

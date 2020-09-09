@@ -19,12 +19,15 @@ DNSRequest* getDNSRequest()
 	{
 		for (int i = 0; i < MAX_REQ; i++)
 		{
+			//该请求池有请求
 			if (!request_pool[i].available)
 			{
+				//未被某个线程处理
 				if (request_pool[i].req->processed == false)
 				{
 					req = request_pool[i].req;
 					request_pool[i].req->processed = true;
+					request_pool[i].startTime = time(NULL);
 					break;
 				}
 			}
@@ -45,6 +48,7 @@ int addDNSRequestPool(DNSRequest *req)
 			req->old_id = req->packet->p_header->h_id;
 			req->new_id = i;
 			request_pool[i].req = req;
+			request_pool[i].startTime = time(NULL);
 			return i;
 		}
 	}

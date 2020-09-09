@@ -13,7 +13,8 @@ DNSHeader* fromDNSHeader(char* src, char **ret_ptr)
 
 	//Get flags
 	cur_word = htons(*(++pointer));
-	new_q->h_qr = (bool)((cur_word & 0x8000) >> 15);
+	new_q->h_qr = (bool)((cur_word & 0x8000) >> 1
+		);
 	new_q->h_opcode = (ushort)((cur_word & 0x7800) >> 11);
 	new_q->h_aa = (bool)((cur_word & 0x0400) >> 10);
 	new_q->h_tc = (bool)((cur_word & 0x0200) >> 9);
@@ -66,6 +67,7 @@ DNSResponse *fromDNSResponse(char* src, char* head, char **ret_ptr)
 	bool name_jumped = false;
 
 	char *name_pointer = src;
+	//èŽ·å–åŸŸå
 	while (1)
 	{
 		if (*name_pointer == '\0')
@@ -182,7 +184,7 @@ char *toDNSResponse(DNSResponse *ret_r)
 	tmp_c++;
 	tmp_u = (ushort*)tmp_c;
 
-	//ÆäËüushortºÍint
+	//å…¶å®ƒushortå’Œint
 	*tmp_u++ = ntohs(ret_r->r_type);
 	*tmp_u++ = ntohs(ret_r->r_class);
 	*(int*)tmp_u = ntohl(ret_r->r_ttl);
@@ -218,6 +220,11 @@ DNSPacket *unpackDNSPacket(char *buf)
 		dns_packet->p_rpointer[0] = fromDNSResponse(cur_ptr, buf, &ret_ptr);
 		cur_ptr = ret_ptr;
 		dns_packet->p_header->h_ANCount = 1;
+	}
+	else
+	{
+		dns_packet->p_rpointer[0] = (DNSResponse*)malloc(sizeof(DNSResponse));
+		dns_packet->p_rpointer[0]->r_rdata = NULL;
 	}
 	//bool h_qr = (dns_packet->p_header->h_flags & 0x8000) >> 15;
 	dns_packet->p_qr = dns_packet->p_header->h_qr ? Q_RESPONSE : Q_QUERY;
